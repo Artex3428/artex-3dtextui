@@ -82,7 +82,7 @@ function DrawText3d(text, targetCoords)
     return onScreen
 end
 
-function StartText3d(text, advancedText, keyInput, action, coords, isGlobalDistance, isCloseDistance, isOnlyOnControlHold, isNotAdvacedText, callback)
+function StartText3d(text, advancedText, keyInput, action, ownText, coords, isGlobalDistance, isCloseDistance, isOnlyOnControlHold, isNotAdvacedText, callback)
     local keyName = keyMap[keyInput] or "Unknown Key"
     local message = string.format("Press [~g~%s~w~] to %s %s", string.upper(keyName), string.lower(action), string.lower(text))
     IsCloseToPoint = false
@@ -96,7 +96,11 @@ function StartText3d(text, advancedText, keyInput, action, coords, isGlobalDista
     if not isNotAdvacedText then
         if distance < isCloseDistance then
             IsCloseToPoint = true
-            DrawText3d(message, coords)
+            if ownText == "" then
+                DrawText3d(message, coords)
+            else
+                DrawText3d(ownText, coords)
+            end
             if IsControlJustPressed(0, keyInput) then
                 if callback and type(callback) == "table" then
                     callback()
