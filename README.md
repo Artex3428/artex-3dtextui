@@ -5,6 +5,8 @@ Install:
     2. Ensure the folder in the server.cfg if not already done with the [ParentForlderName] or whatever you named the file where you start your recources
     3. Done now you just have to add it to some script you want to use it on
 
+    You can remove the tryToRemovePlayerTextWhenClose.lua and toFix.txt if you don't want to try fix it
+
 Usage in the client of a script:
 
 1 arg: Title  
