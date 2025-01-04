@@ -11,14 +11,17 @@ Usage in the client of a script:
 2 arg: Whether to show the simpe text from far away or not  
 3 arg: Key you have to input when close to execute what you want  
 4 arg: Action like Press e to get healthcare or Press e to teleport to hospital  
-5 arg: Whether to show your own text or not if not leave emty string  
-6 arg: Coords where it sohuld be(can be GetEntityCoords(PlayerPedId()) to put it on the ped)  
-7 arg: Global distance how far away the simple text should be shown  
-8 arg: Close range distance of how far away the advanced text/prompt to do sometihng will show  
-9 arg: Whether to have you hold the toggle keybind or not to show the simple text  
-10 arg: Whether you will display the advancetext or not(having this set to true will not let you press a button to execute stuff etc and setting to false will)  
-11 arg: A function that executes what you want to execute  
+5 arg: Coords where it sohuld be(can be GetEntityCoords(PlayerPedId()) to put it on the ped)  
+6 arg: Global distance how far away the simple text should be shown  
+7 arg: Close range distance of how far away the advanced text/prompt to do sometihng will show  
+8 arg: Whether to have you hold the toggle keybind or not to show the simple text  
+9 arg: Whether you will display the advancetext or not(having this set to true will not let you press a button to execute stuff etc and setting to false will)  
+10 arg: A function that executes what you want to execute  
 
-exports['artex-3dtextui']:StartText3d("Healthcare", true, 46, "get", "", vector3(296.0008850097656, -591.5004272460938, 43.27257537841797), 3.0, 1.0, false, false, function()
-    print(GetEntityHealth(PlayerPedId()))
+exports['artex-3dtextui']:StartText3d("Healthcare", true, {46, 47}, "Press [~g~E~w~] to get healthcare or [~R~G~w~] to say hello", vector3(296.0008850097656, -591.5004272460938, 43.27257537841797), 3.0, 1.0, false, false, function(pressedKey)
+    if pressedKey == 46 then
+        print(GetEntityHealth(PlayerPedId()))
+    elseif pressedKey == 47 then
+        print("Hello")
+    end
 end)
