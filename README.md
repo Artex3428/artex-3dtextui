@@ -20,7 +20,7 @@ Usage in the client of a script:
 9 arg: Whether you will display the advancetext or not(having this set to true will not let you press a button to execute stuff etc and setting to false will)  
 10 arg: A function that executes what you want to execute  
 
-exports['artex-3dtextui']:StartText3d("Healthcare", true, {46, 47}, "Press [~g~E~w~] to get healthcare or [~R~G~w~] to say hello", vector3(296.0008850097656, -591.5004272460938, 43.27257537841797), 3.0, 1.0, false, false, function(pressedKey)
+exports['artex-3dtextui']:StartText3d("Healthcare", true, {46, 47}, "Press [~g~E~w~] to get healthcare or [~r~G~w~] to say hello", vector3(296.0008850097656, -591.5004272460938, 43.27257537841797), 3.0, 1.0, false, false, function(pressedKey)
     if pressedKey == 46 then
         print(GetEntityHealth(PlayerPedId()))
     elseif pressedKey == 47 then
