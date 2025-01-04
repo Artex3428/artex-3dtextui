@@ -1,56 +1,13 @@
-local keyMap = {
-    [34] = "A",
-    [29] = "B",
-    [26] = "C",
-    [30] = "D",
-    [46] = "E",
-    [49] = "F",
-    [47] = "G",
-    [74] = "H",
-    [311] = "K",
-    [7] = "L",
-    [244] = "M",
-    [249] = "N",
-    [199] = "P",
-    [44] = "Q",
-    [45] = "R",
-    [33] = "S",
-    [245] = "T",
-    [303] = "U",
-    [0] = "V",
-    [32] = "W",
-    [73] = "X",
-    [246] = "Y",
-    [20] = "Z",
-    [27] = "Up Arrow",
-    [173] = "Down Arrow",
-    [174] = "Left Arrow",
-    [175] = "Right Arrow",
-    [19] = "Left Alt",
-    [344] = "F11",
-    [157] = "Numpad 1",
-    [158] = "Numpad 2",
-    [160] = "Numpad 3",
-    [164] = "Numpad 4",
-    [165] = "Numpad 5",
-    [159] = "Numpad 6",
-    [161] = "Numpad 7",
-    [162] = "Numpad 8",
-    [163] = "Numpad 9",
-    [36] = "Left Ctrl",
-    [21] = "Left Shift",
-    [18] = "Left Alt",
-    [201] = "Enter",
-    [177] = "Backspace",
-    [178] = "Delete",
-    [243] = "Home",
-    [250] = "Insert",
-    [251] = "Page Up",
-    [252] = "Page Down",
-    [253] = "End",
-    [254] = "Caps Lock",
-    [255] = "Scroll Lock"
-}
+DrawnTexts = {}
+
+function IsTextAlreadyAdded(text, coords)
+    for _, v in ipairs(DrawnTexts) do
+        if v.text == text and #(v.coords - coords) < 0.01 then
+            return true
+        end
+    end
+    return false
+end
 
 function DrawText3d(text, targetCoords)
     local camCoords = GetFinalRenderedCamCoord()
@@ -82,59 +39,67 @@ function DrawText3d(text, targetCoords)
     return onScreen
 end
 
-function StartText3d(text, advancedText, keyInput, action, ownText, coords, isGlobalDistance, isCloseDistance, isOnlyOnControlHold, isNotAdvacedText, callback)
-    local keyName = keyMap[keyInput] or "Unknown Key"
-    local message = string.format("Press [~g~%s~w~] to %s %s", string.upper(keyName), string.lower(action), string.lower(text))
+function StartText3d(text, advancedText, keyInput, actionText, coords, isGlobalDistance, isCloseDistance, isOnlyOnControlHold, isNotAdvacedText, callback)
     IsCloseToPoint = false
-    local distance = #(GetEntityCoords(PlayerPedId()) - coords)
-
-    if distance < isGlobalDistance then
-    else
-        Citizen.Wait(1000)
-    end
+    local playerPos = GetEntityCoords(PlayerPedId())
+    local distance = #(playerPos - coords)
 
     if not isNotAdvacedText then
         if distance < isCloseDistance then
             IsCloseToPoint = true
-            if ownText == "" then
-                DrawText3d(message, coords)
-            else
-                DrawText3d(ownText, coords)
+            DrawText3d(actionText, coords)
+            if not IsTextAlreadyAdded(actionText, coords) then
+                table.insert(DrawnTexts, {text = actionText, coords = coords, distance = isGlobalDistance})
             end
-            if IsControlJustPressed(0, keyInput) then
-                if callback and type(callback) == "table" then
-                    callback()
-                else
-                    print("No valid callback provided")
+            for _, key in ipairs(keyInput) do
+                if IsControlJustPressed(0, key) then
+                    callback(key)
                 end
             end
         end
     end
     if isOnlyOnControlHold then
         if IsControlPressed(0, Config.HoldControl) then
-            if isGlobalDistance >= 0.1 then
-                if distance < isGlobalDistance then
-                    if not advancedText then
-                    else
-                        if distance < isGlobalDistance and not IsCloseToPoint then
-                            DrawText3d(text, coords)
+            if distance < isGlobalDistance then
+                if not advancedText then
+                else
+                    if distance < isGlobalDistance and not IsCloseToPoint then
+                        DrawText3d(text, coords)
+                        if not IsTextAlreadyAdded(text, coords) then
+                            table.insert(DrawnTexts, {text = text, coords = coords, distance = isGlobalDistance})
                         end
                     end
                 end
-            elseif isGlobalDistance <= 0.0 then
-                DrawText3d(text, GetEntityCoords(PlayerPedId()))
             end
         end
     else
-        if isGlobalDistance >= 0.1 then
-            if not advancedText then
-            else
-                if distance < isGlobalDistance and not IsCloseToPoint then
-                    DrawText3d(text, coords)
+        if not advancedText then
+        else
+            if distance < isGlobalDistance and not IsCloseToPoint then
+                DrawText3d(text, coords)
+                if not IsTextAlreadyAdded(text, coords) then
+                    table.insert(DrawnTexts, {text = text, coords = coords, distance = isGlobalDistance})
                 end
             end
-        elseif isGlobalDistance <= 0.0 then
-            DrawText3d(text, GetEntityCoords(PlayerPedId()))
         end
+    end
+
+    local allOfRange = true
+
+    for i = #DrawnTexts, 1, -1 do
+        local v = DrawnTexts[i]
+        local distance2 = #(playerPos - v.coords)
+
+        if distance2 > v.distance then
+            table.remove(DrawnTexts, i)
+        else
+            if distance2 < v.distance then
+                allOfRange = false
+            end
+        end
+    end
+
+    if allOfRange then
+        Wait(500)
     end
 end
